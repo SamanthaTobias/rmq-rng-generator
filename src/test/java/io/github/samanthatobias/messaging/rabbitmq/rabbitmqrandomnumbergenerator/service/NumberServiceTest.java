@@ -35,7 +35,7 @@ public class NumberServiceTest {
 	@Test
 	public void testStartGenerating() {
 		numberService.startGenerating();
-		verify(rabbitTemplate, timeout(6000).atLeast(1)).convertAndSend(anyString(), anyString(), anyInt());
+		verify(rabbitTemplate, timeout(6000).atLeast(2)).convertAndSend(anyString(), anyString(), anyInt());
 		numberService.stopGenerating();
 	}
 
@@ -43,7 +43,7 @@ public class NumberServiceTest {
 	public void testStopGenerating() {
 		numberService.startGenerating();
 		numberService.stopGenerating();
-		verify(rabbitTemplate, timeout(12000).times(1)).convertAndSend(anyString(), anyString(), anyInt());
+		verify(rabbitTemplate, timeout(6000).times(1)).convertAndSend(anyString(), anyString(), anyInt());
 	}
 
 	@Test
