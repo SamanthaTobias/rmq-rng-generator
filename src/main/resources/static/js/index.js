@@ -7,7 +7,10 @@ $(function() {
         $.ajax({
             url: action,
             type: method,
-            data: data
+            data: data,
+            success: function() {
+                location.reload();
+            }
         });
         return false;
     });

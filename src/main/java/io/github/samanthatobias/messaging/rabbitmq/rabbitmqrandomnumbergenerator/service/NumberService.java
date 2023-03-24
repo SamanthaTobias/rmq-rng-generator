@@ -55,7 +55,7 @@ public class NumberService {
 	}
 
 	public void startGenerating() {
-		if (executor != null) {
+		if (isActive()) {
 			executor.shutdown();
 		}
 		executor = Executors.newSingleThreadScheduledExecutor();
@@ -69,8 +69,9 @@ public class NumberService {
 	}
 
 	public void stopGenerating() {
-		if (executor != null) {
+		if (isActive()) {
 			executor.shutdown();
+			executor = null;
 			log.info("Shut down executor");
 		}
 	}
@@ -80,6 +81,9 @@ public class NumberService {
 			throw new IllegalArgumentException("Seconds must be greater than 0, is " + seconds);
 		}
 		this.period = seconds;
+		if (isActive()) {
+			startGenerating();
+		}
 		log.info("Set period to {} seconds", period);
 	}
 
@@ -88,11 +92,15 @@ public class NumberService {
 	}
 
 	public String getState() {
-		if (executor == null) {
-			return "INACTIVE";
-		} else {
+		if (isActive()) {
 			return "ACTIVE";
+		} else {
+			return "INACTIVE";
 		}
+	}
+
+	private boolean isActive() {
+		return !(executor == null || executor.isShutdown() || executor.isTerminated());
 	}
 
 }
