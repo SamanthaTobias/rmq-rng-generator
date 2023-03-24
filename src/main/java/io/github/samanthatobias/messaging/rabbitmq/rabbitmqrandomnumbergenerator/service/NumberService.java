@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +38,8 @@ public class NumberService {
 	@Value("${spring.rabbitmq.durable}")
 	private boolean durable;
 
+	private final List<Integer> numbers = new ArrayList<>();
+
 	private ScheduledExecutorService executor;
 	private int period = 5;
 
@@ -57,6 +61,7 @@ public class NumberService {
 		executor = Executors.newSingleThreadScheduledExecutor();
 		executor.scheduleAtFixedRate(() -> {
 			int randomNumber = (int) (Math.random() * 100);
+			numbers.add(randomNumber);
 			log.info("Sending random number: {}", randomNumber);
 			rabbitTemplate.convertAndSend(exchange, routingKey, randomNumber);
 		}, 0, period, TimeUnit.SECONDS);
@@ -71,8 +76,23 @@ public class NumberService {
 	}
 
 	public void setPeriod(int seconds) {
+		if (seconds < 1) {
+			throw new IllegalArgumentException("Seconds must be greater than 0, is " + seconds);
+		}
 		this.period = seconds;
 		log.info("Set period to {} seconds", period);
+	}
+
+	public List<Integer> getNumbers() {
+		return new ArrayList<>(numbers);
+	}
+
+	public String getState() {
+		if (executor == null) {
+			return "INACTIVE";
+		} else {
+			return "ACTIVE";
+		}
 	}
 
 }

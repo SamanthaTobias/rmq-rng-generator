@@ -2,10 +2,9 @@ package io.github.samanthatobias.messaging.rabbitmq.rabbitmqrandomnumbergenerato
 
 import io.github.samanthatobias.messaging.rabbitmq.rabbitmqrandomnumbergenerator.service.NumberService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -14,22 +13,34 @@ public class NumberController {
 	@Autowired
 	private NumberService numberService;
 
+	@GetMapping("/")
+	public String index(Model model) {
+		model.addAttribute("currentState", numberService.getState());
+		model.addAttribute("numbers", numberService.getNumbers());
+		return "index";
+	}
+
 	@GetMapping("/start")
-	public String start() {
+	public ResponseEntity<?> start() {
 		numberService.startGenerating();
-		return "Random number generation started";
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/end")
-	public String end() {
+	public ResponseEntity<?> end() {
 		numberService.stopGenerating();
-		return "Random number generation stopped";
+		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/setPeriod/{seconds}")
-	public String setPeriod(@PathVariable int seconds) {
-		numberService.setPeriod(seconds);
-		return "Period for random number generation set to " + seconds + " seconds";
+	@PostMapping("/setPeriod")
+	public ResponseEntity<?> setPeriod(@RequestParam int seconds) {
+		try {
+			numberService.setPeriod(seconds);
+			return ResponseEntity.ok().build();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return ResponseEntity.unprocessableEntity().build();
+		}
 	}
 
 }
