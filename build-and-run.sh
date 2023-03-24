@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Stop and remove any existing container
+docker stop rabbitmq-random-number-generator >/dev/null 2>&1 && docker rm rabbitmq-random-number-generator >/dev/null 2>&1
+
 # Build the Maven project
 mvn clean package
 
