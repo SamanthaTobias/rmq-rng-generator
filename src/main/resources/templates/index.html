@@ -3,21 +3,7 @@
 <head>
     <title>RabbitMQ Random Number Generator</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(function() {
-            $('form').submit(function(e) {
-                e.preventDefault();
-                var action = $(this).attr('action');
-                var method = $(this).attr('method');
-                var data = $(this).serialize();
-                $.ajax({
-                    url: action,
-                    type: method,
-                    data: data
-                });
-            });
-        });
-    </script>
+    <script th:src="@{/js/index.js}" type="text/javascript"></script>
 </head>
 <body>
 <h1>RabbitMQ Random Number Generator</h1>
